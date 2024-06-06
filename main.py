@@ -52,6 +52,8 @@ def write_file(value: str, file_name: str):
     commit_and_push(file_name)
 
 def commit_and_push(file_name: str):
+    subprocess.run(["git", "config", "--global", "user.email", "fiore_agustin@hotmail.com"])
+    subprocess.run(["git", "config", "--global", "user.name", "AgustinFiore"])
     subprocess.run(["git", "add", file_name])
     subprocess.run(["git", "commit", "-m", f"Update {file_name}"])
     subprocess.run(["git", "push"])
