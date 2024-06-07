@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import chromedriver_autoinstaller
@@ -19,7 +20,11 @@ def get_html(url: str, file_name: str):
     file.close()
 
     time.sleep(5) # Wait for JavaScript to execute and load content
-    element = driver.find_element(By.XPATH, '//*[@id="search-results"]/div[1]/div/div/div[1]/div[1]/div[1]/div[1]/span[2]')
+    try:
+        element = driver.find_element(By.XPATH, '//*[@id="search-results"]/div[1]/div/div/div[1]/div[1]/div[1]/div[1]/span[2]')
+    except NoSuchElementException:
+        driver.quit()
+        return
     text = element.text
     i = 0
     count = ""
