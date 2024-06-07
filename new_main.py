@@ -1,0 +1,103 @@
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+import chromedriver_autoinstaller
+import hashlib
+import os
+import requests
+import subprocess
+import time
+
+def get_html(url: str, file_name: str):
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run in headless mode (no browser window)
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get(url)
+
+    dictionary = construct_dict(file_name)
+    total_saved = len(dictionary)
+
+    time.sleep(2) # Wait for JavaScript to execute and load content
+    continue_loop = True
+    while continue_loop:
+        try:
+            elements = driver.find_elements(By.XPATH, "//a[contains(@class, 'prop-title')]")
+        except NoSuchElementException:
+            driver.quit()
+            return
+
+        for elem in elements:
+            text = driver.execute_script("return arguments[0].innerText;", elem)
+            href = elem.get_attribute("href") or ""
+            hash = get_hash(text)
+            if dictionary.get(hash) is None:
+                send_telegram_message(text + ": " + href)
+            dictionary[hash] = True
+
+        try:
+            new_elem = driver.find_element(By.XPATH, "//a[contains(@class, 'page-next')]")
+            driver.execute_script("arguments[0].click();", new_elem)
+            time.sleep(1)
+        except NoSuchElementException:
+            continue_loop = False
+
+    any_false = any(value == False for value in dictionary.values())
+    true_keys = [key for key, value in dictionary.items() if value]
+    if any_false or len(true_keys) > total_saved:
+        file = open(file_name, 'w')
+        for true_hash in true_keys:
+            file.write(true_hash + "\n")
+        file.close()
+        commit_and_push(file_name)
+    driver.quit()
+
+def commit_and_push(file_name: str):
+    subprocess.run(["git", "config", "--global", "user.email", "fiore_agustin@hotmail.com"])
+    subprocess.run(["git", "config", "--global", "user.name", "AgustinFiore"])
+    subprocess.run(["git", "add", file_name])
+    subprocess.run(["git", "commit", "-m", f"Update {file_name}"])
+    subprocess.run(["git", "push"])
+
+def get_hash(text: str):
+    hash_object = hashlib.sha256()
+    hash_object.update(text.encode())
+    return hash_object.hexdigest()
+
+def construct_dict(file_name: str):
+    file = open(file_name, 'r')
+    dictionary = {}
+    for line in file:
+        dictionary[line.strip()] = False
+    file.close()
+
+    return dictionary
+
+def send_telegram_message(message: str):
+    token = os.getenv('TELEGRAM_BOT_TOKEN')
+    chat_id = os.getenv('TELEGRAM_CHAT_ID')
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": message
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    return response
+
+def main():
+    url_duplex = 'https://www.bahiablancapropiedades.com/buscar#duplex/alquiler/bahia-blanca/todos-los-barrios/por-defecto/mapa=1'
+    url_dpto_tres = 'https://www.bahiablancapropiedades.com/buscar#departamentos/alquiler/bahia-blanca/todos-los-barrios/por-defecto/mapa=1;dormitorios=3_dormitorios'
+    url_casa_tres = 'https://www.bahiablancapropiedades.com/buscar#casas/alquiler/bahia-blanca/todos-los-barrios/por-defecto/mapa=1;dormitorios=3_dormitorios'
+    file_name_duplex = 'duplex_hash.txt'
+    file_name_dpto_tres = 'dpto_tres_hash.txt'
+    file_name_casa_tres = 'casa_tres_hash.txt'
+    chromedriver_autoinstaller.install()
+    get_html(url_duplex, file_name_duplex)
+    get_html(url_dpto_tres, file_name_dpto_tres)
+    get_html(url_casa_tres, file_name_casa_tres)
+
+if __name__ == "__main__":
+    main()
