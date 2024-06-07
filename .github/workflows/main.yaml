@@ -34,4 +34,4 @@ jobs:
         git config --global user.email "fiore_agustin@hotmail.com"
         git config --global user.name "AgustinFiore"
         git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
-        python main.py
+        python new_main.py
