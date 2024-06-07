@@ -21,11 +21,7 @@ def get_html(url: str, file_name: str):
     time.sleep(2) # Wait for JavaScript to execute and load content
     continue_loop = True
     while continue_loop:
-        try:
-            elements = driver.find_elements(By.XPATH, "//a[contains(@class, 'prop-title')]")
-        except NoSuchElementException:
-            driver.quit()
-            return
+        elements = driver.find_elements(By.XPATH, "//a[contains(@class, 'prop-title')]")
 
         for elem in elements:
             text = driver.execute_script("return arguments[0].innerText;", elem)
