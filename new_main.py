@@ -2,6 +2,8 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import chromedriver_autoinstaller
 import hashlib
 import os
@@ -18,17 +20,23 @@ def get_html(url: str, file_name: str):
     dictionary = construct_dict(file_name)
     total_saved = len(dictionary)
 
-    time.sleep(2) # Wait for JavaScript to execute and load content
+    wait = WebDriverWait(driver, 10)
+
     continue_loop = True
     while continue_loop:
-        elements = driver.find_elements(By.XPATH, "//a[contains(@class, 'prop-title')]")
+        try:
+            elements = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//a[contains(@class, 'prop-title')]")))
+            #elements = driver.find_elements(By.XPATH, "//a[contains(@class, 'prop-title')]")
+        except Exception:
+            driver.quit()
+            return
 
         for elem in elements:
             text = driver.execute_script("return arguments[0].innerText;", elem)
             href = elem.get_attribute("href") or ""
             hash = get_hash(text)
             if dictionary.get(hash) is None:
-                print("should send message")
+                print("send message")
                 #send_telegram_message(text + ": " + href)
             dictionary[hash] = True
 
@@ -46,7 +54,7 @@ def get_html(url: str, file_name: str):
         for true_hash in true_keys:
             file.write(true_hash + "\n")
         file.close()
-        commit_and_push(file_name)
+        #commit_and_push(file_name)
     driver.quit()
 
 def commit_and_push(file_name: str):
