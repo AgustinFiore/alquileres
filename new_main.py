@@ -28,7 +28,8 @@ def get_html(url: str, file_name: str):
             href = elem.get_attribute("href") or ""
             hash = get_hash(text)
             if dictionary.get(hash) is None:
-                send_telegram_message(text + ": " + href)
+                print("should send message")
+                #send_telegram_message(text + ": " + href)
             dictionary[hash] = True
 
         try:
