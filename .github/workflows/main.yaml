@@ -2,7 +2,7 @@ name: Apartment Checker
 
 on:
   schedule:
-    - cron: '*/12 * * * *'
+    - cron: '*/15 * * * *'
 
 jobs:
   run-script:
