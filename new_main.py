@@ -11,7 +11,7 @@ import requests
 import subprocess
 import time
 
-def get_html(url: str, file_name: str):
+def process_url(url: str, file_name: str):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     driver = webdriver.Chrome(options=chrome_options)
@@ -98,9 +98,9 @@ def main():
     file_name_dpto_tres = 'dpto_tres_hash.txt'
     file_name_casa_tres = 'casa_tres_hash.txt'
     chromedriver_autoinstaller.install()
-    get_html(url_duplex, file_name_duplex)
-    get_html(url_dpto_tres, file_name_dpto_tres)
-    get_html(url_casa_tres, file_name_casa_tres)
+    process_url(url_duplex, file_name_duplex)
+    process_url(url_dpto_tres, file_name_dpto_tres)
+    process_url(url_casa_tres, file_name_casa_tres)
 
 if __name__ == "__main__":
     main()
