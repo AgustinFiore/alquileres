@@ -13,7 +13,7 @@ import time
 
 def get_html(url: str, file_name: str):
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run in headless mode (no browser window)
+    chrome_options.add_argument("--headless")
     driver = webdriver.Chrome(options=chrome_options)
     driver.get(url)
 
@@ -21,12 +21,11 @@ def get_html(url: str, file_name: str):
     total_saved = len(dictionary)
 
     wait = WebDriverWait(driver, 10)
-
     continue_loop = True
+
     while continue_loop:
         try:
             elements = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//a[contains(@class, 'prop-title')]")))
-            #elements = driver.find_elements(By.XPATH, "//a[contains(@class, 'prop-title')]")
         except Exception:
             driver.quit()
             return
@@ -36,8 +35,7 @@ def get_html(url: str, file_name: str):
             href = elem.get_attribute("href") or ""
             hash = get_hash(text)
             if dictionary.get(hash) is None:
-                print("send message")
-                #send_telegram_message(text + ": " + href)
+                send_telegram_message(text + ": " + href)
             dictionary[hash] = True
 
         try:
@@ -54,7 +52,7 @@ def get_html(url: str, file_name: str):
         for true_hash in true_keys:
             file.write(true_hash + "\n")
         file.close()
-        #commit_and_push(file_name)
+        commit_and_push(file_name)
     driver.quit()
 
 def commit_and_push(file_name: str):
