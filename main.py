@@ -56,8 +56,10 @@ def process_url(url: str, file_name: str):
     driver.quit()
 
 def commit_and_push(file_name: str):
-    subprocess.run(["git", "config", "--global", "user.email", "fiore_agustin@hotmail.com"])
-    subprocess.run(["git", "config", "--global", "user.name", "AgustinFiore"])
+    email = os.getenv('EMAIL')
+    username = os.getenv('USERNAME')
+    subprocess.run(["git", "config", "--global", "user.email", email])
+    subprocess.run(["git", "config", "--global", "user.name", username])
     subprocess.run(["git", "add", file_name])
     subprocess.run(["git", "commit", "-m", f"Update {file_name}"])
     subprocess.run(["git", "push"])
