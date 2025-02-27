@@ -79,6 +79,7 @@ def construct_dict(file_name: str):
     return dictionary
 
 def send_telegram_message(message: str):
+    return
     token = os.getenv('TELEGRAM_BOT_TOKEN')
     chat_id = os.getenv('TELEGRAM_CHAT_ID')
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -95,7 +96,7 @@ def send_telegram_message(message: str):
 def main():
     url_duplex = 'https://www.bahiablancapropiedades.com/buscar#duplex/alquiler/bahia-blanca/todos-los-barrios/por-defecto/mapa=1'
     url_dpto_tres = 'https://www.bahiablancapropiedades.com/buscar#departamentos/alquiler/bahia-blanca/todos-los-barrios/por-defecto/mapa=1;dormitorios=3_dormitorios'
-    url_casa_tres = 'https://www.bahiablancapropiedades.com/buscar#casas/alquiler/bahia-blanca/todos-los-barrios/por-defecto/mapa=1;dormitorios=3_dormitorios'
+    url_casa_tres = 'https://www.bahiablancapropiedades.com/buscar#departamentos/fideicomiso/bahia-blanca/todos-los-barrios/por-defecto/mapa=1'
     file_name_duplex = 'duplex_hash.txt'
     file_name_dpto_tres = 'dpto_tres_hash.txt'
     file_name_casa_tres = 'casa_tres_hash.txt'
