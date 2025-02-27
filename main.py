@@ -79,7 +79,6 @@ def construct_dict(file_name: str):
     return dictionary
 
 def send_telegram_message(message: str):
-    return
     token = os.getenv('TELEGRAM_BOT_TOKEN')
     chat_id = os.getenv('TELEGRAM_CHAT_ID')
     url = f"https://api.telegram.org/bot{token}/sendMessage"
