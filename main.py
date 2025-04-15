@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -10,6 +10,8 @@ import os
 import requests
 import subprocess
 import time
+
+MAX_RETRIES = 3
 
 def process_url(url: str, file_name: str):
     chrome_options = Options()
@@ -31,8 +33,14 @@ def process_url(url: str, file_name: str):
             return
 
         for elem in elements:
-            text = driver.execute_script("return arguments[0].innerText;", elem)
-            href = elem.get_attribute("href") or ""
+            for retry_number in range(MAX_RETRIES):
+                try:
+                    text = driver.execute_script("return arguments[0].innerText;", elem)
+                    href = elem.get_attribute("href") or ""
+                except StaleElementReferenceException as exc:
+                    time.sleep(0.2)
+                    if retry_number + 1 >= MAX_RETRIES:
+                        raise exc
             hash = get_hash(text)
             if dictionary.get(hash) is None:
                 send_telegram_message(text + ": " + href)
