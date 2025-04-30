@@ -37,11 +37,11 @@ def process_url(url: str, file_name: str):
                 try:
                     text = driver.execute_script("return arguments[0].innerText;", elem)
                     href = elem.get_attribute("href") or ""
+                    break
                 except StaleElementReferenceException as exc:
                     time.sleep(0.2)
                     if retry_number + 1 >= MAX_RETRIES:
                         raise exc
-                break
             hash = get_hash(text)
             if dictionary.get(hash) is None:
                 send_telegram_message(text + ": " + href)
